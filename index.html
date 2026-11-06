@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17424F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Safe to Spend</title>
+<style>
+:root{--navy:#17424F;--teal:#2A7F8E;--coral:#E8735A;--ink:#1D2B30;--muted:#5F6F75;--bg:#F6F1E9;--card:#fff;--line:#E1E6E8;--soft:#EEF4F5;
+--ok:#DDF2E3;--okt:#1E6B3A;--amb:#FFEFC2;--ambt:#7A5000;--field:#FBF8F3}
+@media (prefers-color-scheme:dark){:root{--ink:#E8EEF0;--muted:#A9B7BC;--bg:#0E1F25;--card:#16313A;--line:#284752;--soft:#1B3B45;
+--ok:#1E4A31;--okt:#BFF0CF;--amb:#4D3B10;--ambt:#FFE3A3;--field:#0F2730}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body{padding-bottom:84px}
+header{background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:19px;letter-spacing:.2px}header .sub{font-size:12px;color:#CFE3E7}
+main{max-width:560px;margin:0 auto;padding:14px 14px 20px}
+.card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.hero{text-align:center;padding:22px 16px}
+.hero .lbl{font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;opacity:.85}
+.hero .big{font-size:52px;font-weight:800;line-height:1.05;margin:6px 0}
+.hero .meta{font-size:14px;opacity:.9}
+.good{background:var(--ok);color:var(--okt)}.easy{background:var(--amb);color:var(--ambt)}
+h2{font-size:15px;margin:0 0 10px;color:var(--teal);letter-spacing:.3px}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 5px}
+small,.hint{color:var(--muted);font-size:12px;font-weight:400}
+input,select,textarea{width:100%;font-size:17px;padding:11px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--field);color:var(--ink);font-family:inherit}
+textarea{font-size:12px;min-height:90px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:1.3fr 1fr auto;gap:8px;align-items:end}
+button{font:inherit;font-weight:700;font-size:15px;border:0;border-radius:12px;padding:12px 14px;cursor:pointer}
+.primary{background:var(--teal);color:#fff}.coral{background:var(--coral);color:#fff}.ghost{background:var(--soft);color:var(--ink)}
+.block{width:100%;margin-top:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.chips button{padding:8px 12px;font-size:14px;background:var(--soft);color:var(--ink)}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}.item .t{font-weight:600}.item .s{font-size:12px;color:var(--muted)}
+.amt{font-weight:700;white-space:nowrap}.done{opacity:.45;text-decoration:line-through}
+.tick{width:34px;height:34px;border-radius:50%;border:2px solid var(--teal);background:transparent;color:var(--teal);padding:0;font-size:16px}
+.tick.on{background:var(--teal);color:#fff}
+.x{background:transparent;color:var(--muted);padding:6px 8px;font-size:18px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:var(--soft);border-radius:14px;padding:12px}
+.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--muted)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;background:transparent;color:var(--muted);font-size:11px;font-weight:600;padding:6px 2px;border-radius:10px}
+nav button .i{display:block;font-size:20px;margin-bottom:2px}nav button.on{color:var(--teal);background:var(--soft)}
+.hidden{display:none!important}
+.banner{background:var(--amb);color:var(--ambt);border-radius:14px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}
+.steps{display:flex;gap:6px;margin-bottom:10px}.steps i{flex:1;height:5px;border-radius:5px;background:var(--line)}.steps i.on{background:var(--coral)}
+.note{font-size:12px;color:var(--muted);line-height:1.5}
+.bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--teal)}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:20;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+</style>
+<link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-512.png"></head>
+<body>
+<header><div><h1>Safe to Spend</h1><div class="sub" id="hdrsub">Calm money for busy brains</div></div><div class="sub" id="hdrdate"></div></header>
+<main id="app"></main>
+<nav id="nav">
+ <button data-tab="today" class="on"><span class="i">🏠</span>Today</button>
+ <button data-tab="bills"><span class="i">🧾</span>Bills</button>
+ <button data-tab="pots"><span class="i">🫙</span>Pots</button>
+ <button data-tab="wish"><span class="i">⏳</span>Wait list</button>
+ <button data-tab="more"><span class="i">⚙️</span>More</button>
+</nav>
+<div id="modal" class="modal hidden"><div class="sheet" id="sheet"></div></div>
+<script>
+/* Safe-to-Spend engine — pure functions, dates as "YYYY-MM-DD" strings (UTC maths, no timezone drift). */
+const SE = (() => {
+  const BH = new Set([ // England & Wales bank holidays
+    "2026-01-01","2026-04-03","2026-04-06","2026-05-04","2026-05-25","2026-08-31","2026-12-25","2026-12-28",
+    "2027-01-01","2027-03-26","2027-03-29","2027-05-03","2027-05-31","2027-08-30","2027-12-27","2027-12-28",
+    "2028-01-03","2028-04-14","2028-04-17","2028-05-01","2028-05-29","2028-08-28","2028-12-25","2028-12-26"]);
+  const D = s => { const [y, m, d] = s.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+  const S = dt => dt.toISOString().slice(0, 10);
+  const add = (s, n) => { const x = D(s); x.setUTCDate(x.getUTCDate() + n); return S(x); };
+  const diff = (a, b) => Math.round((D(b) - D(a)) / 86400000);       // days from a to b
+  const dow = s => D(s).getUTCDay();                                   // 0 Sun .. 6 Sat
+  const isWorkday = s => dow(s) !== 0 && dow(s) !== 6 && !BH.has(s);
+  const lastDay = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate(); // m 1-12
+  const ymd = (y, m, d) => S(new Date(Date.UTC(y, m - 1, Math.min(d, lastDay(y, m)))));
+  const prevWorkday = s => { while (!isWorkday(s)) s = add(s, -1); return s; };
+  const round2 = x => Math.round((x + Number.EPSILON) * 100) / 100;
+
+  // Paydays. pay = {freq: monthly|lastworking|fourweekly|fortnightly|weekly, day, anchor, shift:true}
+  function paydayInMonth(pay, y, m) {
+    let s = pay.freq === "lastworking" ? ymd(y, m, 31) : ymd(y, m, pay.day || 1);
+    if (pay.freq === "lastworking" || pay.shift !== false) s = prevWorkday(s);
+    return s;
+  }
+  function nextPayday(pay, today) {   // first payday strictly after today
+    if (pay.freq === "monthly" || pay.freq === "lastworking") {
+      let [y, m] = today.split("-").map(Number);
+      for (let i = 0; i < 3; i++) {
+        const p = paydayInMonth(pay, y, m);
+        if (p > today) return p;
+        m++; if (m > 12) { m = 1; y++; }
+      }
+    }
+    const step = { weekly: 7, fortnightly: 14, fourweekly: 28 }[pay.freq];
+    let a = pay.anchor;
+    if (a > today) { while (add(a, -step) > today) a = add(a, -step); return a; }
+    const k = Math.floor(diff(a, today) / step) + 1;
+    return add(a, k * step);
+  }
+  function lastPayday(pay, today) {   // most recent payday on or before today
+    if (pay.freq === "monthly" || pay.freq === "lastworking") {
+      let [y, m] = today.split("-").map(Number);
+      for (let i = 0; i < 3; i++) {
+        const p = paydayInMonth(pay, y, m);
+        if (p <= today) return p;
+        m--; if (m < 1) { m = 12; y--; }
+      }
+    }
+    const step = { weekly: 7, fortnightly: 14, fourweekly: 28 }[pay.freq];
+    return add(nextPayday(pay, today), -step);
+  }
+
+  // Bill occurrences in [from, to) — bill = {id, name, amount, freq: monthly|counciltax|weekly|fortnightly|fourweekly|yearly, day, anchor}
+  function occurrences(bill, from, to) {
+    const out = [];
+    if (bill.freq === "monthly" || bill.freq === "counciltax") {
+      let [y, m] = from.split("-").map(Number);
+      for (let i = 0; i < 4; i++) {
+        const s = ymd(y, m, bill.day || 1);
+        const ctOff = bill.freq === "counciltax" && (m === 2 || m === 3);   // 10 instalments Apr–Jan
+        if (s >= from && s < to && !ctOff) out.push(s);
+        m++; if (m > 12) { m = 1; y++; }
+      }
+    } else if (bill.freq === "yearly") {
+      const [, mm, dd] = bill.anchor.split("-").map(Number);
+      for (let y = Number(from.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) {
+        const s = ymd(y, mm, dd); if (s >= from && s < to) out.push(s);
+      }
+    } else {
+      const step = { weekly: 7, fortnightly: 14, fourweekly: 28 }[bill.freq];
+      let s = bill.anchor;
+      if (s < from) s = add(s, Math.ceil(diff(s, from) / step) * step);
+      else while (add(s, -step) >= from) s = add(s, -step);
+      for (; s < to; s = add(s, step)) out.push(s);
+    }
+    return out;
+  }
+
+  /* Main calculation.
+     st = {pay, balance, balanceDate, cushion, bills[], pots[{id,name,perPay,doneFor,paused}], spends[{id,date,amount,note}], paid{key:true}}
+     Bills due from balanceDate (inclusive) up to (not incl.) next payday count unless ticked paid.
+     Pots still to fund this pay period count unless done or paused.                                          */
+  function compute(st, today) {
+    const payday = nextPayday(st.pay, today);
+    const periodStart = lastPayday(st.pay, today);
+    const daysLeft = Math.max(1, diff(today, payday));           // today .. day before payday
+    const spentSince = st.spends.filter(s => s.date >= st.balanceDate && s.ts > (st.balanceTs || 0)).reduce((a, s) => a + s.amount, 0);
+    const spentToday = st.spends.filter(s => s.date === today).reduce((a, s) => a + s.amount, 0);
+    const available = st.balance - spentSince;
+    const billsDue = [];
+    for (const b of st.bills) for (const d of occurrences(b, st.balanceDate, payday)) {
+      const key = b.id + "@" + d;
+      billsDue.push({ key, id: b.id, name: b.name, amount: b.amount, date: d, paid: !!st.paid[key] });
+    }
+    billsDue.sort((a, b) => a.date < b.date ? -1 : 1);
+    const billsOwed = billsDue.filter(b => !b.paid).reduce((a, b) => a + b.amount, 0);
+    const potsOwed = st.pots.filter(p => p.doneFor !== periodStart && !p.paused).reduce((a, p) => a + p.perPay, 0);
+    const free = available - billsOwed - potsOwed - (st.cushion || 0);       // money free until payday (after today's spends)
+    const freeAtStartOfToday = free + spentToday;
+    const allowanceToday = freeAtStartOfToday / daysLeft;
+    const leftToday = allowanceToday - spentToday;
+    return {
+      today, payday, periodStart, daysLeft, available: round2(available), billsDue, billsOwed: round2(billsOwed),
+      potsOwed: round2(potsOwed), free: round2(free), allowanceToday: round2(Math.max(0, allowanceToday)),
+      leftToday: round2(leftToday), spentToday: round2(spentToday),
+      over: free < 0, shortBy: round2(Math.max(0, -free)),
+      perDayCut: round2(Math.max(0, -free) / daysLeft),
+      weekAllowance: round2(Math.max(0, freeAtStartOfToday) / daysLeft * Math.min(7, daysLeft)),
+    };
+  }
+  const WAIT_HOURS = 48;
+  const wishStatus = (w, nowMs) => (nowMs - w.ts) >= WAIT_HOURS * 3600000 ? "ready" : "waiting";
+  const hoursLeft = (w, nowMs) => Math.max(0, Math.ceil(WAIT_HOURS - (nowMs - w.ts) / 3600000));
+  return { add, diff, isWorkday, nextPayday, lastPayday, occurrences, compute, wishStatus, hoursLeft, round2, BH };
+})();
+if (typeof module !== "undefined") module.exports = SE;
+
+(() => {
+const KEY = "safe2spend_v1";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const gbp = x => (x < 0 ? "-£" : "£") + Math.abs(x).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const gbp0 = x => (x < 0 ? "-£" : "£") + Math.abs(x).toLocaleString("en-GB", { maximumFractionDigits: 0 });
+const uid = () => Math.random().toString(36).slice(2, 9);
+const pad = n => String(n).padStart(2, "0");
+const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const nice = s => new Date(s + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+const num = v => { const x = parseFloat(String(v).replace(/[£,\s]/g, "")); return isFinite(x) ? Math.round(x * 100) / 100 : NaN; };
+const FREQ = { monthly: "Monthly", counciltax: "Council tax (10 months, Apr–Jan)", weekly: "Weekly", fortnightly: "Every 2 weeks", fourweekly: "Every 4 weeks", yearly: "Yearly" };
+const PAYF = { monthly: "Monthly on a date", lastworking: "Last working day of the month", fourweekly: "Every 4 weeks", fortnightly: "Every 2 weeks", weekly: "Weekly" };
+
+let st = null, tab = "today", storageOK = true;
+function blank() { return { v: 1, setup: false, pay: { freq: "monthly", day: 28, shift: true, anchor: todayStr() }, balance: 0, balanceDate: todayStr(), balanceTs: Date.now(),
+  cushion: 25, bills: [], pots: [], spends: [], paid: {}, wishes: [], letGo: 0, letGoCount: 0, checkins: [] }; }
+function load() { try { const raw = localStorage.getItem(KEY); st = raw ? JSON.parse(raw) : blank(); } catch (e) { storageOK = false; st = blank(); } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); storageOK = true; } catch (e) { storageOK = false; } }
+function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
+function checkin() { const t = todayStr(); if (!st.checkins.includes(t)) { st.checkins.push(t); st.checkins = st.checkins.slice(-400); save(); } }
+function streak() { let n = 0, d = todayStr(); const set = new Set(st.checkins); while (set.has(d)) { n++; d = SE.add(d, -1); } return n; }
+function openSheet(html) { $("#sheet").innerHTML = html; $("#modal").classList.remove("hidden"); }
+function closeSheet() { $("#modal").classList.add("hidden"); }
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeSheet(); });
+
+/* ---------------- TODAY ---------------- */
+function viewToday() {
+  const t = todayStr(), r = SE.compute(st, t);
+  const wishReady = st.wishes.filter(w => SE.wishStatus(w, Date.now()) === "ready").length;
+  let hero;
+  if (r.over) {
+    hero = `<div class="card hero easy"><div class="lbl">Let's reset — no stress</div><div class="big">${gbp(r.shortBy)}</div>
+      <div class="meta">short before payday (${nice(r.payday)}). That's about <b>${gbp(r.perDayCut)}</b> a day to find. Options below 👇</div></div>
+      <div class="card"><h2>GENTLE RESET OPTIONS</h2>
+      ${st.pots.filter(p => !p.paused && p.doneFor !== r.periodStart).map(p => `<div class="item"><div><div class="t">Pause “${esc(p.name)}” this payday</div><div class="s">frees ${gbp(p.perPay)}</div></div><button class="ghost" data-pause="${p.id}">Pause</button></div>`).join("")}
+      ${st.cushion > 0 ? `<div class="item"><div><div class="t">Use your cushion</div><div class="s">frees ${gbp(st.cushion)}</div></div><button class="ghost" id="usecush">Use it</button></div>` : ""}
+      <div class="note" style="margin-top:8px">Overspending happens. This isn't a red mark — it's just a new plan. If a bill can't be paid, contact the company early; free help: StepChange or MoneyHelper.</div></div>`;
+  } else if (r.leftToday < 0) {
+    hero = `<div class="card hero easy"><div class="lbl">Today's amount is used</div><div class="big">${gbp(0)}</div>
+      <div class="meta">You went ${gbp(-r.leftToday)} over today — tomorrow quietly adjusts. Payday ${nice(r.payday)}.</div></div>`;
+  } else {
+    hero = `<div class="card hero good"><div class="lbl">Safe to spend today</div><div class="big">${gbp(r.leftToday)}</div>
+      <div class="meta">${r.spentToday > 0 ? `of ${gbp(r.allowanceToday)} · ` : ""}payday in ${r.daysLeft} day${r.daysLeft === 1 ? "" : "s"} (${nice(r.payday)})</div></div>`;
+  }
+  const stale = SE.diff(st.balanceDate, t);
+  const due = r.billsDue;
+  const potsTodo = st.pots.filter(p => !p.paused && p.doneFor !== r.periodStart);
+  const spendsToday = st.spends.filter(s => s.date === t).slice().reverse();
+  return `${!storageOK ? `<div class="banner">⚠️ This browser isn't saving your data. Use More → Backup after each change, or open the app in Chrome/Safari.</div>` : ""}
+  ${stale >= 7 ? `<div class="banner">Your bank balance was last updated ${stale} days ago. A quick update keeps the number honest.</div>` : ""}
+  ${hero}
+  <div class="card"><h2>I JUST SPENT…</h2>
+    <div class="row3"><div><input id="spAmt" inputmode="decimal" placeholder="£ amount"></div><div><input id="spNote" placeholder="on…"></div><button class="coral" id="spAdd">Add</button></div>
+    <div class="chips">${[3, 5, 10, 20].map(v => `<button data-quick="${v}">£${v}</button>`).join("")}</div>
+    ${spendsToday.length ? `<div style="margin-top:8px">${spendsToday.map(s => `<div class="item"><div><div class="t">${esc(s.note || "Spend")}</div><div class="s">today</div></div><div class="amt">${gbp(s.amount)} <button class="x" data-unspend="${s.id}" aria-label="Undo">↶</button></div></div>`).join("")}</div>` : ""}
+  </div>
+  <div class="card"><h2>BEFORE PAYDAY</h2>
+    ${due.length ? due.map(b => `<div class="item"><div class="${b.paid ? "done" : ""}"><div class="t">${esc(b.name)}</div><div class="s">${nice(b.date)}</div></div><div style="display:flex;gap:10px;align-items:center"><span class="amt ${b.paid ? "done" : ""}">${gbp(b.amount)}</span><button class="tick ${b.paid ? "on" : ""}" data-paid="${b.key}" aria-label="Mark paid">✓</button></div></div>`).join("") : `<div class="note">No bills due before payday. 🎉</div>`}
+    ${potsTodo.map(p => `<div class="item"><div><div class="t">🫙 Move to “${esc(p.name)}”</div><div class="s">this payday</div></div><div style="display:flex;gap:10px;align-items:center"><span class="amt">${gbp(p.perPay)}</span><button class="tick" data-potdone="${p.id}" aria-label="Moved">✓</button></div></div>`).join("")}
+    <div class="note" style="margin-top:6px">Tick a bill once it has left your account (if your balance already includes it). Cushion kept aside: ${gbp(st.cushion || 0)}.</div>
+  </div>
+  <div class="card"><div class="stats">
+    <div class="stat"><b>${gbp(r.available)}</b><span>in the bank (by my log)</span></div>
+    <div class="stat"><b>${gbp(Math.max(0, r.free))}</b><span>free until payday</span></div>
+    <div class="stat"><b>${gbp0(st.letGo)}</b><span>saved by “let it go” (${st.letGoCount})</span></div>
+    <div class="stat"><b>${streak()} 🔥</b><span>day check-in streak</span></div></div>
+    <button class="ghost block" id="balBtn">🏦 Update my bank balance</button>
+    ${wishReady ? `<button class="primary block" data-go="wish">⏳ ${wishReady} wait-list item${wishReady > 1 ? "s" : ""} ready to decide</button>` : ""}
+  </div>`;
+}
+function bindToday() {
+  const add = v => { const a = num(v ?? $("#spAmt").value); if (!(a > 0)) { toast("Enter an amount"); return; }
+    st.spends.push({ id: uid(), date: todayStr(), ts: Date.now(), amount: a, note: $("#spNote").value.trim() }); st.spends = st.spends.slice(-2000); save(); render(); toast(`Logged ${gbp(a)}`); };
+  $("#spAdd").onclick = () => add();
+  $("#spAmt").addEventListener("keydown", e => { if (e.key === "Enter") add(); });
+  document.querySelectorAll("[data-quick]").forEach(b => b.onclick = () => add(b.dataset.quick));
+  document.querySelectorAll("[data-unspend]").forEach(b => b.onclick = () => { st.spends = st.spends.filter(s => s.id !== b.dataset.unspend); save(); render(); });
+  document.querySelectorAll("[data-paid]").forEach(b => b.onclick = () => { const k = b.dataset.paid; if (st.paid[k]) delete st.paid[k]; else st.paid[k] = true; save(); render(); });
+  document.querySelectorAll("[data-potdone]").forEach(b => b.onclick = () => { const p = st.pots.find(x => x.id === b.dataset.potdone); const r = SE.compute(st, todayStr());
+    p.doneFor = r.periodStart; p.saved = SE.round2((p.saved || 0) + p.perPay); save(); render(); toast(`${gbp(p.perPay)} moved to ${p.name} 🫙`); });
+  document.querySelectorAll("[data-pause]").forEach(b => b.onclick = () => { const p = st.pots.find(x => x.id === b.dataset.pause); p.paused = true; save(); render(); toast(`${p.name} paused this payday`); });
+  const uc = $("#usecush"); if (uc) uc.onclick = () => { st.cushion = 0; save(); render(); toast("Cushion released"); };
+  $("#balBtn").onclick = balanceSheet;
+  document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+}
+function balanceSheet() {
+  openSheet(`<h2>UPDATE MY BANK BALANCE</h2><p class="note">Open your banking app and type the balance you see right now. Spends you've logged before now are assumed to be included.</p>
+  <label>Balance now (£)</label><input id="bNew" inputmode="decimal" value="${SE.compute(st, todayStr()).available}">
+  <button class="primary block" id="bSave">Save balance</button><button class="ghost block" id="bCancel">Cancel</button>`);
+  $("#bSave").onclick = () => { const v = num($("#bNew").value); if (!isFinite(v)) return toast("Enter a number");
+    st.balance = v; st.balanceDate = todayStr(); st.balanceTs = Date.now(); save(); closeSheet(); render(); toast("Balance updated ✓"); };
+  $("#bCancel").onclick = closeSheet;
+}
+
+/* ---------------- BILLS ---------------- */
+function billForm(b) {
+  b = b || { name: "", amount: "", freq: "monthly", day: 1, anchor: todayStr() };
+  return `<h2>${b.id ? "EDIT" : "ADD"} A BILL OR DIRECT DEBIT</h2>
+  <label>Name</label><input id="fName" value="${esc(b.name)}" placeholder="e.g. Rent, Phone, Netflix">
+  <div class="row"><div><label>Amount (£)</label><input id="fAmt" inputmode="decimal" value="${b.amount}"></div>
+  <div><label>How often</label><select id="fFreq">${Object.entries(FREQ).map(([k, v]) => `<option value="${k}" ${k === b.freq ? "selected" : ""}>${v}</option>`).join("")}</select></div></div>
+  <div id="fDayBox"><label>Day of the month it leaves</label><input id="fDay" type="number" min="1" max="31" value="${b.day || 1}"><small>31 = last day of shorter months too</small></div>
+  <div id="fAnchorBox"><label>Next (or any) date it leaves</label><input id="fAnchor" type="date" value="${b.anchor || todayStr()}"></div>
+  <button class="primary block" id="fSave">Save</button>${b.id ? `<button class="ghost block" id="fDel">Delete bill</button>` : ""}<button class="ghost block" id="fCancel">Cancel</button>`;
+}
+function billSheet(b) {
+  openSheet(billForm(b));
+  const sync = () => { const f = $("#fFreq").value, monthly = f === "monthly" || f === "counciltax";
+    $("#fDayBox").classList.toggle("hidden", !monthly); $("#fAnchorBox").classList.toggle("hidden", monthly); };
+  $("#fFreq").onchange = sync; sync();
+  $("#fSave").onclick = () => { const amount = num($("#fAmt").value), name = $("#fName").value.trim();
+    if (!name || !(amount > 0)) return toast("Add a name and an amount");
+    const day = Math.min(31, Math.max(1, parseInt($("#fDay").value) || 1));
+    const nb = { id: b?.id || uid(), name, amount, freq: $("#fFreq").value, day, anchor: $("#fAnchor").value || todayStr() };
+    if (b?.id) st.bills = st.bills.map(x => x.id === b.id ? nb : x); else st.bills.push(nb);
+    save(); closeSheet(); render(); };
+  $("#fCancel").onclick = closeSheet;
+  if ($("#fDel")) $("#fDel").onclick = () => { st.bills = st.bills.filter(x => x.id !== b.id); save(); closeSheet(); render(); };
+}
+function monthlyEquiv(b) { return { monthly: 1, counciltax: 10 / 12, weekly: 52 / 12, fortnightly: 26 / 12, fourweekly: 13 / 12, yearly: 1 / 12 }[b.freq] * b.amount; }
+function viewBills() {
+  const total = st.bills.reduce((a, b) => a + monthlyEquiv(b), 0);
+  return `<div class="card"><h2>BILLS & DIRECT DEBITS</h2>
+  ${st.bills.length ? st.bills.map(b => `<div class="item" data-edit="${b.id}" style="cursor:pointer"><div><div class="t">${esc(b.name)}</div><div class="s">${FREQ[b.freq]}${b.freq === "monthly" || b.freq === "counciltax" ? ` · day ${b.day}` : ` · from ${nice(b.anchor)}`}</div></div><div class="amt">${gbp(b.amount)}</div></div>`).join("") : `<div class="note">Add rent, phone, subscriptions, council tax… anything that leaves automatically.</div>`}
+  <button class="primary block" id="addBill">+ Add a bill</button></div>
+  <div class="card"><div class="stats"><div class="stat"><b>${gbp(total)}</b><span>bills in an average month</span></div><div class="stat"><b>${st.bills.length}</b><span>bills tracked</span></div></div>
+  <p class="note">Tip: check your banking app's “Direct Debits” and “Subscriptions” lists — the forgotten £4.99s add up.</p></div>`;
+}
+function bindBills() { $("#addBill").onclick = () => billSheet(); document.querySelectorAll("[data-edit]").forEach(el => el.onclick = () => billSheet(st.bills.find(b => b.id === el.dataset.edit))); }
+
+/* ---------------- POTS ---------------- */
+function viewPots() {
+  const r = SE.compute(st, todayStr());
+  return `<div class="card"><h2>POTS · SINKING FUNDS</h2><p class="note">Money you set aside each payday for things you know are coming — Christmas, car, birthdays, a holiday.</p>
+  ${st.pots.length ? st.pots.map(p => { const pct = p.target ? Math.min(100, Math.round((p.saved || 0) / p.target * 100)) : 0;
+    return `<div class="item" style="display:block"><div style="display:flex;justify-content:space-between"><div><div class="t">${esc(p.name)} ${p.paused ? "· paused" : ""}</div>
+    <div class="s">${gbp(p.perPay)} each payday · saved ${gbp(p.saved || 0)}${p.target ? ` of ${gbp(p.target)}` : ""} · ${p.doneFor === r.periodStart ? "✓ moved this payday" : "to move this payday"}</div></div>
+    <button class="x" data-potedit="${p.id}">✎</button></div>${p.target ? `<div class="bar"><i style="width:${pct}%"></i></div>` : ""}</div>`; }).join("") : ""}
+  <button class="primary block" id="addPot">+ Add a pot</button></div>`;
+}
+function potSheet(p) {
+  p = p || { name: "", perPay: "", target: "", saved: 0 };
+  openSheet(`<h2>${p.id ? "EDIT" : "ADD"} A POT</h2><label>Name</label><input id="pName" value="${esc(p.name)}" placeholder="e.g. Christmas">
+  <div class="row"><div><label>Each payday (£)</label><input id="pPer" inputmode="decimal" value="${p.perPay}"></div><div><label>Goal (£, optional)</label><input id="pTarget" inputmode="decimal" value="${p.target || ""}"></div></div>
+  <label>Already saved (£)</label><input id="pSaved" inputmode="decimal" value="${p.saved || 0}">
+  ${p.id ? `<label><input type="checkbox" id="pPaused" ${p.paused ? "checked" : ""} style="width:auto"> Paused (skip it for now)</label>` : ""}
+  <button class="primary block" id="pSave">Save</button>${p.id ? `<button class="ghost block" id="pDel">Delete pot</button>` : ""}<button class="ghost block" id="pCancel">Cancel</button>`);
+  $("#pSave").onclick = () => { const perPay = num($("#pPer").value), name = $("#pName").value.trim(); if (!name || !(perPay >= 0)) return toast("Add a name and an amount");
+    const np = { ...p, id: p.id || uid(), name, perPay, target: num($("#pTarget").value) || 0, saved: num($("#pSaved").value) || 0, paused: $("#pPaused") ? $("#pPaused").checked : false, doneFor: p.doneFor || "" };
+    if (p.id) st.pots = st.pots.map(x => x.id === p.id ? np : x); else st.pots.push(np); save(); closeSheet(); render(); };
+  $("#pCancel").onclick = closeSheet;
+  if ($("#pDel")) $("#pDel").onclick = () => { st.pots = st.pots.filter(x => x.id !== p.id); save(); closeSheet(); render(); };
+}
+function bindPots() { $("#addPot").onclick = () => potSheet(); document.querySelectorAll("[data-potedit]").forEach(b => b.onclick = () => potSheet(st.pots.find(p => p.id === b.dataset.potedit))); }
+
+/* ---------------- WAIT LIST ---------------- */
+function viewWish() {
+  const now = Date.now();
+  return `<div class="card"><h2>48-HOUR WAIT LIST</h2><p class="note">Want something that isn't planned? Park it here. After 48 hours, decide calmly: buy it, or let it go and bank the win.</p>
+  <div class="row3"><div><input id="wName" placeholder="What is it?"></div><div><input id="wPrice" inputmode="decimal" placeholder="£ price"></div><button class="coral" id="wAdd">Park</button></div></div>
+  <div class="card">${st.wishes.length ? st.wishes.slice().reverse().map(w => { const ready = SE.wishStatus(w, now) === "ready";
+    return `<div class="item"><div><div class="t">${esc(w.name)}</div><div class="s">${ready ? "✅ Ready to decide" : `⏳ ${SE.hoursLeft(w, now)}h to go`}</div></div>
+    <div style="display:flex;gap:6px;align-items:center"><span class="amt">${gbp(w.price)}</span>${ready ? `<button class="ghost" data-buy="${w.id}">Buy</button><button class="primary" style="white-space:nowrap" data-letgo="${w.id}">Let go</button>` : `<button class="x" data-letgo="${w.id}" title="Let go now">✕</button>`}</div></div>`; }).join("")
+    : `<div class="note">Nothing parked. Next time you're about to tap “Buy now”, park it here instead.</div>`}</div>
+  <div class="card"><div class="stats"><div class="stat"><b>${gbp0(st.letGo)}</b><span>kept by letting go</span></div><div class="stat"><b>${st.letGoCount}</b><span>things let go</span></div></div></div>`;
+}
+function bindWish() {
+  $("#wAdd").onclick = () => { const price = num($("#wPrice").value), name = $("#wName").value.trim(); if (!name || !(price > 0)) return toast("Add the item and its price");
+    st.wishes.push({ id: uid(), name, price, ts: Date.now() }); save(); render(); toast("Parked for 48 hours ⏳"); };
+  document.querySelectorAll("[data-letgo]").forEach(b => b.onclick = () => { const w = st.wishes.find(x => x.id === b.dataset.letgo);
+    st.wishes = st.wishes.filter(x => x.id !== w.id); st.letGo = SE.round2(st.letGo + w.price); st.letGoCount++; save(); render(); toast(`${gbp(w.price)} kept. Nice. 🌱`); });
+  document.querySelectorAll("[data-buy]").forEach(b => b.onclick = () => { const w = st.wishes.find(x => x.id === b.dataset.buy);
+    st.wishes = st.wishes.filter(x => x.id !== w.id); st.spends.push({ id: uid(), date: todayStr(), ts: Date.now(), amount: w.price, note: w.name }); save(); render(); toast("Logged as a spend — enjoy it, guilt-free"); });
+}
+
+/* ---------------- MORE ---------------- */
+function payFields(p) {
+  return `<label>How are you paid?</label><select id="mFreq">${Object.entries(PAYF).map(([k, v]) => `<option value="${k}" ${k === p.freq ? "selected" : ""}>${v}</option>`).join("")}</select>
+  <div id="mDayBox"><label>Pay date</label><input id="mDay" type="number" min="1" max="31" value="${p.day || 28}">
+  <label style="font-weight:400"><input type="checkbox" id="mShift" ${p.shift !== false ? "checked" : ""} style="width:auto"> If it falls on a weekend or bank holiday, I'm paid the working day before</label></div>
+  <div id="mAnchorBox"><label>A recent or next payday</label><input id="mAnchor" type="date" value="${p.anchor || todayStr()}"></div>`;
+}
+function bindPayFields() { const sync = () => { const f = $("#mFreq").value; $("#mDayBox").classList.toggle("hidden", f !== "monthly"); $("#mAnchorBox").classList.toggle("hidden", !["weekly", "fortnightly", "fourweekly"].includes(f)); };
+  $("#mFreq").onchange = sync; sync(); }
+function readPay() { return { freq: $("#mFreq").value, day: Math.min(31, Math.max(1, parseInt($("#mDay").value) || 28)), shift: $("#mShift").checked, anchor: $("#mAnchor").value || todayStr() }; }
+function viewMore() {
+  return `<div class="card"><h2>PAYDAY</h2>${payFields(st.pay)}
+  <label>Cushion to keep aside (£)<small> — a small buffer the app never counts as spendable</small></label><input id="mCush" inputmode="decimal" value="${st.cushion}">
+  <button class="primary block" id="mSave">Save settings</button><p class="note">Next payday: <b>${nice(SE.nextPayday(st.pay, todayStr()))}</b>. Bank holidays included for England &amp; Wales to 2028.</p></div>
+  <div class="card"><h2>BACKUP — PLEASE DO THIS</h2><p class="note">Your data lives only in this browser on this device. Clearing browsing data deletes it. Back up weekly, or before switching phones.</p>
+  <button class="primary block" id="bkFile">⬇ Download backup file</button><button class="ghost block" id="bkCode">📋 Copy backup code</button>
+  <label>Restore from a backup</label><input type="file" id="bkIn" accept=".json,application/json,text/plain"><textarea id="bkPaste" placeholder="…or paste a backup code here"></textarea>
+  <button class="ghost block" id="bkRestore">Restore</button></div>
+  <div class="card"><h2>EXAMPLE &amp; RESET</h2><button class="ghost block" id="demo">Load example data (to explore)</button><button class="ghost block" id="wipe">Start again (erase everything)</button></div>
+  <div class="card"><h2>HOW THE NUMBER WORKS</h2><p class="note">Safe to spend today = (bank balance − spends logged since − bills due before payday that haven't left yet − pot money for this payday − cushion) ÷ days left until payday. Spend less today and tomorrow's number rises; spend more and it quietly falls. Nothing here is financial advice. Free, independent help: MoneyHelper, StepChange, Citizens Advice. © VectorDigitalPlus · v1.0</p></div>`;
+}
+function bindMore() {
+  bindPayFields();
+  $("#mSave").onclick = () => { st.pay = readPay(); const c = num($("#mCush").value); st.cushion = c >= 0 ? c : 0; save(); render(); toast("Saved ✓"); };
+  const code = () => btoa(unescape(encodeURIComponent(JSON.stringify(st))));
+  $("#bkFile").onclick = () => { try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(st)], { type: "application/json" }));
+    a.download = `safe-to-spend-backup-${todayStr()}.json`; document.body.appendChild(a); a.click(); a.remove(); toast("Backup downloaded"); } catch (e) { toast("Download blocked — use Copy backup code"); } };
+  $("#bkCode").onclick = async () => { const c = code(); try { await navigator.clipboard.writeText(c); toast("Backup code copied — paste it into your Notes app"); }
+    catch (e) { $("#bkPaste").value = c; $("#bkPaste").select(); toast("Code shown below — copy it to your Notes app"); } };
+  const restore = txt => { try { let s = txt.trim(); if (!s.startsWith("{")) s = decodeURIComponent(escape(atob(s))); const o = JSON.parse(s);
+      if (!o || o.v !== 1 || !Array.isArray(o.bills)) throw 0; st = Object.assign(blank(), o); save(); render(); toast("Restored ✓"); } catch (e) { toast("That backup couldn't be read"); } };
+  $("#bkRestore").onclick = () => { const f = $("#bkIn").files[0]; if (f) { const rd = new FileReader(); rd.onload = () => restore(rd.result); rd.readAsText(f); } else if ($("#bkPaste").value) restore($("#bkPaste").value); else toast("Choose a file or paste a code"); };
+  $("#demo").onclick = () => { if (st.setup && !confirm("Replace your data with example data? (Back up first if you want to keep it.)")) return; st = demoData(); save(); go("today"); toast("Example loaded — explore freely"); };
+  $("#wipe").onclick = () => { if (!confirm("Erase everything on this device?")) return; st = blank(); save(); render(); };
+}
+function demoData() {
+  const t = todayStr(), s = blank();
+  Object.assign(s, { setup: true, pay: { freq: "monthly", day: 28, shift: true, anchor: t }, balance: 1240, balanceDate: t, balanceTs: Date.now() - 60000, cushion: 25,
+    bills: [{ id: "b1", name: "Rent", amount: 725, freq: "monthly", day: 1 }, { id: "b2", name: "Council tax", amount: 142, freq: "counciltax", day: 15 },
+      { id: "b3", name: "Phone", amount: 18, freq: "monthly", day: 20 }, { id: "b4", name: "Spotify", amount: 12.99, freq: "monthly", day: 9 },
+      { id: "b5", name: "Energy", amount: 96, freq: "monthly", day: 12 }],
+    pots: [{ id: "p1", name: "Christmas", perPay: 60, target: 300, saved: 180, doneFor: "", paused: false }, { id: "p2", name: "Car MOT", perPay: 15, target: 60, saved: 30, doneFor: "", paused: false }],
+    wishes: [{ id: "w1", name: "Noise-cancelling headphones", price: 89, ts: Date.now() - 50 * 3600000 }, { id: "w2", name: "Another plant 🌿", price: 14, ts: Date.now() - 6 * 3600000 }],
+    letGo: 136, letGoCount: 4, checkins: [SE.add(t, -2), SE.add(t, -1)] });
+  s.spends.push({ id: "s1", date: t, ts: Date.now(), amount: 3.4, note: "Coffee" });
+  return s;
+}
+
+/* ---------------- SETUP WIZARD ---------------- */
+let step = 0;
+function viewSetup() {
+  const bar = `<div class="steps">${[0, 1, 2, 3].map(i => `<i class="${i <= step ? "on" : ""}"></i>`).join("")}</div>`;
+  if (step === 0) return `<div class="card">${bar}<h2>WELCOME 👋</h2><p style="font-size:17px;line-height:1.5;margin:4px 0 10px">One number, every day: <b>how much you can safely spend today</b> — after bills, savings pots and a little cushion.</p>
+    <p class="note">Setup takes about 3 minutes. Everything stays on this device — no account, no bank login.</p>
+    <button class="primary block" id="sNext">Let's set it up</button><button class="ghost block" id="sDemo">Just show me an example first</button></div>`;
+  if (step === 1) return `<div class="card">${bar}<h2>1 · WHEN DO YOU GET PAID?</h2>${payFields(st.pay)}<button class="primary block" id="sNext">Next</button></div>`;
+  if (step === 2) return `<div class="card">${bar}<h2>2 · WHAT'S IN YOUR ACCOUNT NOW?</h2><p class="note">Open your banking app and copy your current balance. Just one account — the one bills come out of.</p>
+    <label>Balance now (£)</label><input id="sBal" inputmode="decimal" placeholder="e.g. 845.20"><label>Cushion to keep aside (£)</label><input id="sCush" inputmode="decimal" value="25"><button class="primary block" id="sNext">Next</button></div>`;
+  return `<div class="card">${bar}<h2>3 · YOUR REGULAR BILLS</h2><p class="note">Add the big ones now (rent, council tax, phone, energy). You can add the rest any time from the Bills tab.</p>
+    ${st.bills.map(b => `<div class="item"><div class="t">${esc(b.name)}</div><div class="amt">${gbp(b.amount)}</div></div>`).join("")}
+    <button class="ghost block" id="sBill">+ Add a bill</button><button class="primary block" id="sDone">Show me my number →</button></div>`;
+}
+function bindSetup() {
+  const n = $("#sNext");
+  if (step === 0) { n.onclick = () => { step = 1; render(); }; $("#sDemo").onclick = () => { st = demoData(); save(); render(); toast("Example loaded — More → Start again when you're ready"); }; }
+  if (step === 1) { bindPayFields(); n.onclick = () => { st.pay = readPay(); step = 2; save(); render(); }; }
+  if (step === 2) n.onclick = () => { const b = num($("#sBal").value); if (!isFinite(b)) return toast("Enter your balance");
+    st.balance = b; st.balanceDate = todayStr(); st.balanceTs = Date.now(); const c = num($("#sCush").value); st.cushion = c >= 0 ? c : 0; step = 3; save(); render(); };
+  if (step === 3) { $("#sBill").onclick = () => billSheet(); $("#sDone").onclick = () => { st.setup = true; save(); go("today"); }; }
+}
+
+/* ---------------- ROUTER ---------------- */
+const VIEWS = { today: [viewToday, bindToday], bills: [viewBills, bindBills], pots: [viewPots, bindPots], wish: [viewWish, bindWish], more: [viewMore, bindMore] };
+function render() {
+  $("#hdrdate").textContent = new Date().toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+  $("#nav").classList.toggle("hidden", !st.setup);
+  if (!st.setup) { $("#app").innerHTML = viewSetup(); bindSetup(); return; }
+  checkin();
+  const [v, b] = VIEWS[tab]; $("#app").innerHTML = v(); b();
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x.dataset.tab === tab));
+}
+function go(t) { tab = t; render(); window.scrollTo(0, 0); }
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => go(b.dataset.tab));
+document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+load(); render();
+window.__S2S = { get st() { return st; }, go };
+})();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}</script></body>
+</html>
